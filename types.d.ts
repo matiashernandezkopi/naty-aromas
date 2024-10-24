@@ -16,3 +16,15 @@ interface Productos {
     'Talle 5'?:number,
     'Talle 6'?:number,
 }
+
+interface Ventas {
+    id: string,
+    userID: string,
+    fecha: Date | string,
+    fechaUltimoPago: Date | string,
+    cantidad: number,
+    cliente: string,
+    pagoTotal: number,
+    ultimoPago: number,
+    contacto: string,
+}

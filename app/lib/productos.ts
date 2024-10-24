@@ -3,6 +3,7 @@
 // lib/Productos.ts
 import { db } from './firebase';
 import { collection, addDoc, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid'; // Importa uuid para generar un ID único
 
 
 // Función para agregar un gasto
@@ -10,6 +11,7 @@ export async function addProducto(userId: string, producto: Productos) {
   try {
     const docRef = await addDoc(collection(db, 'productos'), {
       ...producto,
+      id: uuidv4(),
       userID: userId,
     });
     return docRef.id; // Devuelve el ID generado del producto
