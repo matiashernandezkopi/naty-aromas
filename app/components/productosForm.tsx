@@ -3,6 +3,7 @@ import { addProducto } from '../lib/productos';
 import { useAuth } from '../context/AuthContext';
 
 export function ProductoForm() {
+  const [error, setError] = useState<string|null>()
   const [tipoProducto, setTipoProducto] = useState<'ropa' | 'medias' | 'perfume' | 'otro'>('ropa');
     
   const { user, refreshProductos } = useAuth();
@@ -95,6 +96,11 @@ export function ProductoForm() {
       nuevoProducto = productoTipoPerfume;
     }
 
+    if (!nuevoProducto.nombre) {
+      setError('Falta nombre')
+      return
+    }
+    setError(null)
     try {
       if (user) {
         await addProducto(user.uid, nuevoProducto); // Guardamos el producto en Firebase
@@ -106,126 +112,113 @@ export function ProductoForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <select value={tipoProducto} onChange={handleTipoChange}>
-        <option value="ropa">Ropa</option>
-        <option value="medias">Medias</option>
-        <option value="perfume">Perfume</option>
-        <option value="otro">Otro</option>
-      </select>
+    <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-lg space-y-4">
+  {error && <p className="text-red-500 text-sm font-semibold">{error}</p>}
 
-      <input
-        type="text"
-        name="nombre"
-        placeholder="Nombre"
-        value={tipoProducto === 'ropa' ? productoTipoRopa.nombre : tipoProducto === 'medias' ? productoTipoMedias.nombre : productoTipoPerfume.nombre}
-        onChange={handleChange}
-      />
+  <div>
+    <label className="block text-gray-700 font-semibold mb-1">Tipo de producto:</label>
+    <select
+      value={tipoProducto}
+      onChange={handleTipoChange}
+      className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <option value="ropa">Ropa</option>
+      <option value="medias">Medias</option>
+      <option value="perfume">Perfume</option>
+      <option value="otro">Otro</option>
+    </select>
+  </div>
 
-      <input
-        type="text"
-        name="marca"
-        placeholder="Marca"
-        value={tipoProducto === 'ropa' ? productoTipoRopa.marca : tipoProducto === 'medias' ? productoTipoMedias.marca : productoTipoPerfume.marca}
-        onChange={handleChange}
-      />
+  <div>
+    <label className="block text-gray-700 font-semibold mb-1">Nombre:</label>
+    <input
+      type="text"
+      name="nombre"
+      placeholder="Nombre"
+      value={tipoProducto === 'ropa' ? productoTipoRopa.nombre : tipoProducto === 'medias' ? productoTipoMedias.nombre : productoTipoPerfume.nombre}
+      onChange={handleChange}
+      className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
 
+  <div>
+    <label className="block text-gray-700 font-semibold mb-1">Marca:</label>
+    <input
+      type="text"
+      name="marca"
+      placeholder="Marca"
+      value={tipoProducto === 'ropa' ? productoTipoRopa.marca : tipoProducto === 'medias' ? productoTipoMedias.marca : productoTipoPerfume.marca}
+      onChange={handleChange}
+      className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+
+  <div>
+    <label className="block text-gray-700 font-semibold mb-1">Precio:</label>
+    <input
+      type="number"
+      name="precio"
+      placeholder="Precio"
+      value={tipoProducto === 'ropa' ? productoTipoRopa.precio : tipoProducto === 'medias' ? productoTipoMedias.precio : productoTipoPerfume.precio}
+      onChange={handleChange}
+      className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+
+  {tipoProducto === 'ropa' && (
+    <div className="grid grid-cols-2 gap-4">
+      {['S', 'M', 'L', 'XL'].map(size => (
+        <div key={size}>
+          <label className="block text-gray-700 font-semibold mb-1">{size}</label>
+          <input
+            type="number"
+            name={size}
+            placeholder={size}
+            value={productoTipoRopa[size]}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      ))}
+    </div>
+  )}
+
+  {tipoProducto === 'medias' && (
+    <div className="grid grid-cols-2 gap-4">
+      {[2, 3, 4, 5, 6].map(size => (
+        <div key={size}>
+          <label className="block text-gray-700 font-semibold mb-1">Talle {size}</label>
+          <input
+            type="number"
+            name={`Talle ${size}`}
+            placeholder={`Talle ${size}`}
+            value={productoTipoMedias[`Talle ${size}`]}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      ))}
+    </div>
+  )}
+
+  {tipoProducto === 'perfume' && (
+    <div>
+      <label className="block text-gray-700 font-semibold mb-1">Cantidad:</label>
       <input
         type="number"
-        name="precio"
-        placeholder="Precio"
-        value={tipoProducto === 'ropa' ? productoTipoRopa.precio : tipoProducto === 'medias' ? productoTipoMedias.precio : productoTipoPerfume.precio}
+        name="cantidad"
+        placeholder="Cantidad"
+        value={productoTipoPerfume.cantidad}
         onChange={handleChange}
+        className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
+    </div>
+  )}
 
-      {tipoProducto === 'ropa' && (
-        <>
-          <input
-            type="number"
-            name="S"
-            placeholder="S"
-            value={productoTipoRopa.S}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="M"
-            placeholder="M"
-            value={productoTipoRopa.M}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="L"
-            placeholder="L"
-            value={productoTipoRopa.L}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="XL"
-            placeholder="XL"
-            value={productoTipoRopa.XL}
-            onChange={handleChange}
-          />
-        </>
-      )}
+  <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    Guardar Producto
+  </button>
+</form>
 
-      {tipoProducto === 'medias' && (
-        <>
-          <input
-            type="number"
-            name="Talle 2"
-            placeholder="Talle 2"
-            value={productoTipoMedias['Talle 2']}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="Talle 3"
-            placeholder="Talle 3"
-            value={productoTipoMedias['Talle 3']}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="Talle 4"
-            placeholder="Talle 4"
-            value={productoTipoMedias['Talle 4']}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="Talle 5"
-            placeholder="Talle 5"
-            value={productoTipoMedias['Talle 5']}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="Talle 6"
-            placeholder="Talle 6"
-            value={productoTipoMedias['Talle 6']}
-            onChange={handleChange}
-          />
-        </>
-      )}
-
-      {tipoProducto === 'perfume' && (
-        <>
-          <input
-            type="number"
-            name="cantidad"
-            placeholder="Cantidad"
-            value={productoTipoPerfume.cantidad}
-            onChange={handleChange}
-          />
-        </>
-      )}
-
-      <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md shadow hover:bg-blue-600">
-        Guardar Producto
-      </button>
-    </form>
   );
 }

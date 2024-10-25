@@ -15,6 +15,7 @@ interface Productos {
     'Talle 4'?:number,
     'Talle 5'?:number,
     'Talle 6'?:number,
+    [key: string]: number | string | undefined;
 }
 
 interface Ventas {

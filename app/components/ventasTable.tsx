@@ -80,7 +80,7 @@ export function VentasTable() {
     const totalPages = Math.ceil(filteredVentas.length / itemsPerPage);
 
     return (
-        <>
+        <div className=" w-full">
             {/* Campo de búsqueda */}
             <input
                 type="text"
@@ -212,6 +212,6 @@ export function VentasTable() {
                     Siguiente
                 </button>
             </div>
-        </>
+        </div>
     );
 }

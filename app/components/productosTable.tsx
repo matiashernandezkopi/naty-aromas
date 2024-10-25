@@ -12,7 +12,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import React, { useState } from "react";
 
 export function ProductosTable() {
   const { Productos, refreshProductos } = useAuth();
@@ -32,10 +32,10 @@ export function ProductosTable() {
 
   // Función para renderizar cantidad o detalles de tallas
   const renderCantidadOrDetails = (producto: Productos) => {
-    if (producto.cantidad) {
+    if (producto.cantidad && producto.cantidad > 0) {
       return (
         <span>
-          Total: <span className={producto.cantidad > 0 ? 'text-green-500' : 'text-red-500'}>{producto.cantidad}</span>
+          Total: <span className='text-green-500'>{ producto.cantidad}</span>
         </span>
       );
     } else {
@@ -44,16 +44,16 @@ export function ProductosTable() {
   
       sizeKeys.forEach((key) => {
         const value = producto[key];
-        if (typeof value === 'number') {
+        if (typeof value === 'number' && value > 0) {
             detalles.push(
-              <span key={key}>
-                {key}: <span className={value > 0 ? 'text-green-500' : 'text-red-500'}>{value}</span>{" "}
+                <span key={key}>
+                {key}: <span className='text-green-500'>{ value}</span>{" "}
               </span>
             );
           }
         });
   
-      return detalles.length > 0 ? detalles : <span>Sin detalles</span>;
+      return detalles.length > 0 ? detalles : <span>Sin unidades disponibles</span>;
     }
   };
 
@@ -80,32 +80,9 @@ export function ProductosTable() {
   }, 0);
 
   return (
-    <>
-      {/* Inputs para filtrar por tipo, nombre y marca */}
-      <div className="flex gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Buscar por tipo"
-          value={tipoFilter}
-          onChange={(e) => setTipoFilter(e.target.value)}
-          className="border p-2 rounded"
-        />
-        <input
-          type="text"
-          placeholder="Buscar por nombre"
-          value={nombreFilter}
-          onChange={(e) => setNombreFilter(e.target.value)}
-          className="border p-2 rounded"
-        />
-        <input
-          type="text"
-          placeholder="Buscar por marca"
-          value={marcaFilter}
-          onChange={(e) => setMarcaFilter(e.target.value)}
-          className="border p-2 rounded"
-        />
-      </div>
-
+    <div className=" w-screen">
+      
+      <TalbleForm setMarcaFilter={setMarcaFilter} setNombreFilter={setNombreFilter} setTipoFilter={setTipoFilter} tipoFilter={tipoFilter} marcaFilter={marcaFilter} nombreFilter={nombreFilter} />
       <Table>
         <TableCaption>Una lista de tus productos recientes.</TableCaption>
         <TableHeader>
@@ -123,7 +100,7 @@ export function ProductosTable() {
             <TableRow key={producto.id}>
               <TableCell>{producto.tipo}</TableCell>
               <TableCell>{producto.nombre}</TableCell>
-              <TableCell>{producto.marca}</TableCell>
+              <TableCell>{producto.marca ? (producto.marca) : ('Desconocido')}</TableCell>
               <TableCell className="text-right">
                 {new Intl.NumberFormat('es-US', {
                   style: 'currency',
@@ -151,6 +128,51 @@ export function ProductosTable() {
           </TableRow>
         </TableFooter>
       </Table>
-    </>
+    </div>
   );
+}
+
+interface TableFormProps {
+
+  setTipoFilter: (value: string) => void;
+  setNombreFilter: (value: string) => void;
+  setMarcaFilter: (value: string) => void;
+  tipoFilter: string;
+  nombreFilter: string;
+  marcaFilter: string;
+}
+
+export const TalbleForm:React.FC<TableFormProps> = ({
+  setTipoFilter,
+  setNombreFilter,
+  setMarcaFilter,
+  tipoFilter,
+  nombreFilter,
+  marcaFilter,
+}) => {
+  return (
+    <div className="flex gap-4 mb-4">
+      <input
+        type="text"
+        placeholder="Buscar por tipo"
+        value={tipoFilter}
+        onChange={(e) => setTipoFilter(e.target.value)}
+        className="border p-2 rounded"
+      />
+      <input
+        type="text"
+        placeholder="Buscar por nombre"
+        value={nombreFilter}
+        onChange={(e) => setNombreFilter(e.target.value)}
+        className="border p-2 rounded"
+      />
+      <input
+        type="text"
+        placeholder="Buscar por marca"
+        value={marcaFilter}
+        onChange={(e) => setMarcaFilter(e.target.value)}
+      className="border p-2 rounded"
+    />
+  </div>
+  )
 }

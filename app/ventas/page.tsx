@@ -6,7 +6,7 @@ import { VentasForm } from '../components/ventasForm'
 
 export default function VentasPage() {
   return (
-    <div>
+    <div className='flex w-screen justify-between gap-1 p-2'>
       <VentasTable/>
       <VentasForm/>
 
