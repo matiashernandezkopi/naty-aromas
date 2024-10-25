@@ -19,8 +19,14 @@ export default function Home() {
           >
           Ventas
         </Link>
-        
 
+        <Link
+          href='/store'
+          className={`block text-white font-semibold py-2 px-4 rounded transition duration-200 bg-red-600 hover:bg-red-500 dark:bg-red-700 dark:hover:bg-red-600 `}
+          >
+          Tienda
+        </Link>
+        
         <ModeToggle/> 
         <LoginButton/>  
 

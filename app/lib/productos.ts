@@ -2,7 +2,7 @@
 
 // lib/Productos.ts
 import { db } from './firebase';
-import { collection, addDoc, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid'; // Importa uuid para generar un ID único
 
 
@@ -21,22 +21,54 @@ export async function addProducto(userId: string, producto: Productos) {
   }
 }
 
+
 // Función para obtener los gastos del usuario
 export async function getProductos(userId: string): Promise<Productos[]> {
   try {
     const ProductosRef = collection(db, 'productos');
     const q = query(ProductosRef, where('userID', '==', userId));
     const snapshot = await getDocs(q);
-    const Productos = snapshot.docs.map(doc => ({
+    
+    const productos = snapshot.docs.map(doc => ({
       id: doc.id,
-      ...(doc.data() as Omit<Productos, 'id'>)  // Asegúrate de que todos los campos están presentes
-    }));
-    return Productos;
+      ...doc.data() as Omit<Productos, 'id'> // Agrega todos los campos restantes al tipo
+    })) as Productos[]; // Asegúrate de hacer un cast a Productos[] para evitar errores de tipo
+
+    return productos;
   } catch (error) {
     console.error('Error fetching Productos:', error);
     throw error;
   }
 }
+
+export async function updateProductoByID(id: string, data: Partial<Productos>): Promise<void> {
+  try {
+    const productosRef = collection(db, 'productos');
+    
+    // Crea la consulta para encontrar el documento que coincida con el 'id' proporcionado
+    const q = query(productosRef, where('id', '==', id));
+    
+    // Obtiene los documentos que coinciden con la consulta
+    const querySnapshot = await getDocs(q);
+    
+    // Verifica si se encontró al menos un documento
+    if (querySnapshot.empty) {
+      console.error('No se encontró ningún documento con el id:', id);
+      return; // Salir si no se encontró el documento
+    }
+    
+    // Si se encontró un documento, actualiza el primero
+    const productoDoc = querySnapshot.docs[0]; // Obtiene el primer documento que coincide
+    await updateDoc(doc(db, 'productos', productoDoc.id), data);
+    
+    console.log(`Producto ${id} actualizado correctamente con los datos:`, data);
+  } catch (error) {
+    console.error('Error al actualizar el producto:', error);
+  }
+}
+
+
+
 
 // Función para eliminar un gasto
 export async function deleteProductoById(id: string): Promise<void> {
